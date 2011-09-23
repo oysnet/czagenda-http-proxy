@@ -1,7 +1,9 @@
 var httpProxy = require('http-proxy'),
     servers = require('./lib/servers').Servers,
     log = require('czagenda-log').from(__filename);
-
+    p = require('./lib/proxy').p;
+    
+    
 servers.set([
   {
     host: '10.7.50.111',
@@ -13,6 +15,12 @@ servers.set([
   }
 ]);
 
+var http = require('http');
+var server = http.createServer(function(req,res) {
+  p(req,res,servers.get());
+}).listen(8000);
+
+/*
 var server = httpProxy.createServer(function(req,res,proxy) {
   var target = servers.get();
   function proxyError(err, req,res) {
@@ -37,4 +45,4 @@ var server = httpProxy.createServer(function(req,res,proxy) {
   });
 });
 server.listen(8000);
-
+*/
