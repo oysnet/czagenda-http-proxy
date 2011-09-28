@@ -1,19 +1,25 @@
 var httpProxy = require('http-proxy'),
-    servers = require('./lib/servers').Servers,
-    log = require('czagenda-log').from(__filename);
-    p = require('./lib/proxy').p;
-    
-    
-servers.set([
-  {
-    host: '10.7.50.111',
-    port: 3000
-  },
-  {
-    host: '10.7.50.118',
-    port: 3000
+    Servers = require('./lib/servers').Servers,
+    Server = require('./lib/server').Server,
+    log = require('czagenda-log').from(__filename),
+    p = require('./lib/proxy').p,
+    czdiscovery = require('czagenda-discovery');
+
+
+var b = new czdiscovery.Browser('http-api');
+
+b.on('up', function(info) {
+  log.debug("api-http up: ",info.id);
+  Servers.add(new Server(info.host,info.port));
+});
+
+b.on('down', function(info) {
+  log.debug("api-http down: ",info.id);
+  var server = Servers.find(info.host,info.port);
+  if(server !== null) {
+    Servers.remove(server);
   }
-]);
+});
 
 var http = require('http');
 var server = http.createServer(function(req,res) {
