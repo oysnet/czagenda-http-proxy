@@ -1,5 +1,4 @@
-var httpProxy = require('http-proxy'),
-    Servers = require('./lib/servers').Servers,
+var Servers = require('./lib/servers').Servers,
     Server = require('./lib/server').Server,
     log = require('czagenda-log').from(__filename),
     p = require('./lib/proxy').p,
