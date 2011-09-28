@@ -1,0 +1,12 @@
+{
+  "name": "czagenda-http-proxy",
+  "description": "Node loadbalancer with autodiscovery and failover",
+  "version": "0.0.1",
+  "homepage": "http://czagenda.org",
+  "repository": "git@git.oxys.net:czagenda-log",
+  "main": "index",
+  "dependencies": {
+      "czagenda-discovery": ">= 0.0.1"
+  },
+  "engines": { "node": "*" }
+}
