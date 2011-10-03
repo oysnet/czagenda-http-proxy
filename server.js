@@ -1,26 +1,20 @@
-var Servers = require('./lib/servers').Servers,
-    Server = require('./lib/server').Server,
-    log = require('czagenda-log').from(__filename),
-    p = require('./lib/proxy').p,
-    czdiscovery = require('czagenda-discovery');
+var spawn = require('child_process').spawn,
+    cluster = require('cluster'),
+    start = process.argv[process.argv.length - 1] === 'start',
+    config = require('./settings').server;
 
+if (start) {
+  var node = process.execPath,
+      cmd = process.argv.slice(1, -1);
+  spawn(node, cmd, { env : process.env, setsid: true });
+  process.exit(0);
+}
 
-var b = new czdiscovery.Browser('http-api');
-
-b.on('up', function(info) {
-  log.debug("api-http up: ",info.id);
-  Servers.add(new Server(info.host,info.port));
-});
-
-b.on('down', function(info) {
-  log.debug("api-http down: ",info.id);
-  var server = Servers.find(info.host,info.port);
-  if(server !== null) {
-    Servers.remove(server);
-  }
-});
-
-var http = require('http');
-var server = http.createServer(function(req,res) {
-  p(req,res,servers.get());
-}).listen(8000);
+var cluster = require('cluster')('./app')
+  .set('workers', 1)
+  .use(cluster.logger('logs'))
+  .use(cluster.stats())
+  .use(cluster.pidfiles('pids'))
+  .use(cluster.cli())
+  .use(cluster.repl(8888))
+  .listen(config.port);

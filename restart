@@ -1,0 +1,49 @@
+#!/bin/bash 
+
+start()
+{
+	cd /home/czagenda-http-proxy;
+        node server.js start;
+}
+restart()
+{
+	cd /home/czagenda-http-proxy;
+        node server.js -r;
+}
+
+killall()
+{
+	ps axwww|grep node|grep server|awk '{print $1}'|xargs kill -9 2>&1 >>/dev/null || true;
+}
+
+get_master_pid()
+{
+	cd /home/czagenda-http-proxy;
+	echo `node server.js -s|grep master|awk '{print $2}'`;
+}
+
+if [ "d`node server.js -s|grep dead|grep master`" != "d" ] || [ "dNaN" == "d$(get_master_pid)" ] || [ "d" == "d$(get_master_pid)" ]; then \
+	echo "master is dead";
+	killall;
+	start;
+else \
+	PID=$(get_master_pid); 
+	restart;
+	waiting=10;
+	i=0;
+	while (( $i < $waiting )); do \
+		sleep 1;
+		if [ "d$PID" != "d$(get_master_pid)" ]; then \
+			break;
+		fi;
+		i=$((i + 1)); 
+	done;
+	if [ "d$PID" == "d$(get_master_pid)" ]; then \
+		echo "won't restart";
+		killall;  
+	        start;
+	else \
+		echo "restarted";
+	fi;
+fi;
+

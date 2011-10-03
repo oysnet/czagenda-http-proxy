@@ -6,6 +6,7 @@
   "repository": "git@git.oxys.net:czagenda-log",
   "main": "index",
   "dependencies": {
+      "cluster": "= 0.7.4",
       "czagenda-discovery": ">= 0.0.1",
       "czagenda-log": ">= 0.0.1"
   },
